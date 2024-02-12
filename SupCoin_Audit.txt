@@ -2,14 +2,16 @@
 
 ================ sup token ================
 
--it should replace "-" to div, "+" to add. 
-If you audit this contract in solidproof or Certik, you will receive request like this.
-I am working with solidproot & Certik company for audit of smart contract.
+-You need to replace "-" for -div and "+" for append.
+    If you audit this contract with hard evidence or curtis, you will be asked this.
+    I am working with soliddproof & Certic company for smart contract audit.
 
--require renounce function
--It is more better if you fix withdrawToken function like bellow.
-When function renounce, fee address can withdraw tokens
-function withdrawToken(address _tokenAddress,uint256 _amount) external onlyOwner {
+- Requires onwership renounce function
+
+- It would be better to modify the Withdrawal Token function as shown below.
+    If you give up ownership of contract, you can withdraw tokens to the fee address.
+
+    function withdrawToken(address _tokenAddress,uint256 _amount) external onlyOwner {
         IERC20(_tokenAddress).transfer(owner(),_amount);
     }
 
@@ -18,42 +20,81 @@ function withdrawToken(address _tokenAddress,uint256 _amount) external onlyOwner
         IERC20(_tokenAddress).transfer(owner(),_amount);
     }
 
-It same withdrawETH function
+    Even though, you renounce the ownership, it should available to withdraw tokens and ETH.
+
+- allocateTokens function is not work. 
+    You should fix this function by transferfrom. Previous developer can fix this issue easily.
+
+    function allocateTokens(
+        address presale, address staking, address team, address ecosystem, 
+        address marketing, address treasury, address airdrop, address dev
+    ) external onlyOwner() {
+    
+        require(balanceOf(address(this)) == TOTAL_SUPPLY, "Already allocated");
+
+        transfer(presale, TOTAL_SUPPLY * 230 / 1000);
+        transfer(staking, TOTAL_SUPPLY * 120 / 1000);
+
+        transfer(team, TOTAL_SUPPLY * 100 / 1000);
+        transfer(ecosystem, TOTAL_SUPPLY * 228 / 1000);
+        transfer(marketing, TOTAL_SUPPLY * 100 / 1000);
+
+        transfer(treasury, TOTAL_SUPPLY * 55 / 1000);
+
+        transfer(owner(), TOTAL_SUPPLY * 15 / 100);
+
+        transfer(airdrop, TOTAL_SUPPLY * 2 / 1000);
+        transfer(dev, TOTAL_SUPPLY * 150 / 1000);
+    }
+
+
 
 ================ Presale ================
 
-
+No error in Presale.
 
 
 ================ Staking ================
 -consider renounce function
 
--Sub address should be set constructor
-This is rule of smart contract building
-Subcoin decimal is 18. But staking contract indicated decimal 6 of supcoin.
-We should detact decimal from token contract or should initialize in contractor.
+-You must set Subaddresses as constructor.
+      These are the rules for building smart contracts.
+      The decimal number of subcoin is 18. However, the staking contract shows the decimal number 6 for Supercoin.
+      The decimal point must be removed from the token contract or initialized in the contract.
 
-function setFeeWallet(address _addr) public onlyOwner {
-        feeWallet = _addr;
-    }
+    function setFeeWallet(address _addr) public onlyOwner {
+            feeWallet = _addr;
+        }
 
-function setFeeWallet(address _addr) public {
-        require(feeWallet == msg.sender, "only feeWallet can access to this function");
-        feeWallet = _addr;
-    }
+    function setFeeWallet(address _addr) public {
+            require(feeWallet == msg.sender, "only feeWallet can access to this function");
+            feeWallet = _addr;
+        }
 
-When ownershop renounce, anyone can't change the feeWallet. So we have to change code like bellow.
-function setToken(address _addr, uint256 _decimal) public onlyOwner {
-        require(_addr != address(0), "invalid address");
-        require(_decimal > 0, "decimal must be greater than zero");
+    When you renounce ownership of smart contract, anyone can't change the feeWallet. So we have to change code like bellow.
+    function setToken(address _addr, uint256 _decimal) public onlyOwner {
+            require(_addr != address(0), "invalid address");
+            require(_decimal > 0, "decimal must be greater than zero");
 
-        SUP = _addr;
-        SUP_DECIMAL = _decimal;
-    }
+            SUP = _addr;
+            SUP_DECIMAL = _decimal;
+        }
     
-It requires removing this function. Users may think sup token has some wrong. If sup token is perfect, it hasn't required to change the token address.
-
-
+    This feature should be removed. Users may think there is a problem with the sup token. If your Sup token is perfect, there is no need to change the token address.
 
 ================ Airdrop ================
-After user cliam the token, user's claimable amount should decrease.
+
+-After a user claims a token, the amount the user can claim should decrease in claim function.
+    function claim(uint256 _amount) public  {
+        require(block.timestamp >= startTime, "SUP AIRDROP: Not started yet.");
+        require(block.timestamp <= endTime, "SUP AIRDROP: Aready ended.");
+        require(_amount>0, "SUP AIRDROP: Amount should be bigger than zero.");
+        require(userClaimableAmount[msg.sender] > 0, "Caller is not in the whitelist.");
+       
+        SupToken.transfer(msg.sender, _amount);
+
+        // userClaimableAmount[]msg.sender -+ _amount;
+        userClaimedAmount[msg.sender] += _amount;
+
+        emit Claim(msg.sender, _amount);        
+    }
