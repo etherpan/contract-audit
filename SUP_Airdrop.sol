@@ -20,7 +20,6 @@ contract SUP_AIRDROP is Ownable(msg.sender) {
     receive() payable external {}
 
     constructor(address _SupTokenAddress, uint256 _startTime, uint256 _endTime) {
-
         SupToken = IERC20(_SupTokenAddress);
         SupTokenAddress = _SupTokenAddress;
         startTime = _startTime;

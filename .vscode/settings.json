@@ -1,0 +1,9 @@
+"editor.tabSize": 4, // Set tab size to 4 spaces
+"editor.insertSpaces": true, // Insert spaces instead of tabs
+"editor.detectIndentation": false, // Disable automatic indentation detection
+"[solidity]": {
+    "editor.defaultFormatter": "JuanBlanco.solidity",
+    "editor.insertSpaces": true,
+    "editor.tabSize": 4,
+    "editor.trimAutoWhitespace": true
+}

@@ -1,0 +1,59 @@
+
+
+================ sup token ================
+
+-it should replace "-" to div, "+" to add. 
+If you audit this contract in solidproof or Certik, you will receive request like this.
+I am working with solidproot & Certik company for audit of smart contract.
+
+-require renounce function
+-It is more better if you fix withdrawToken function like bellow.
+When function renounce, fee address can withdraw tokens
+function withdrawToken(address _tokenAddress,uint256 _amount) external onlyOwner {
+        IERC20(_tokenAddress).transfer(owner(),_amount);
+    }
+
+    function withdrawToken(address _tokenAddress,uint256 _amount) external {
+        require(feeAddress == msg.sender, "only fee address can access");
+        IERC20(_tokenAddress).transfer(owner(),_amount);
+    }
+
+It same withdrawETH function
+
+================ Presale ================
+
+
+
+
+================ Staking ================
+-consider renounce function
+
+-Sub address should be set constructor
+This is rule of smart contract building
+Subcoin decimal is 18. But staking contract indicated decimal 6 of supcoin.
+We should detact decimal from token contract or should initialize in contractor.
+
+function setFeeWallet(address _addr) public onlyOwner {
+        feeWallet = _addr;
+    }
+
+function setFeeWallet(address _addr) public {
+        require(feeWallet == msg.sender, "only feeWallet can access to this function");
+        feeWallet = _addr;
+    }
+
+When ownershop renounce, anyone can't change the feeWallet. So we have to change code like bellow.
+function setToken(address _addr, uint256 _decimal) public onlyOwner {
+        require(_addr != address(0), "invalid address");
+        require(_decimal > 0, "decimal must be greater than zero");
+
+        SUP = _addr;
+        SUP_DECIMAL = _decimal;
+    }
+    
+It requires removing this function. Users may think sup token has some wrong. If sup token is perfect, it hasn't required to change the token address.
+
+
+
+================ Airdrop ================
+After user cliam the token, user's claimable amount should decrease.

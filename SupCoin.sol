@@ -35,13 +35,12 @@ interface IFactory {
     ) external returns (address uniswapV2Pair);
 }
 
-contract SupCoin is ERC20, Ownable
-{
+contract SupCoin is ERC20, Ownable(msg.sender) {
     string constant TOKEN_NAME = "SupCoin";
     string constant TOKEN_SYMBOL = "SUP";
 
     uint8 internal constant DECIMAL_PLACES = 18;
-    uint256 constant TOTAL_SUPPLY = 10**10 * 10**DECIMAL_PLACES;
+    uint256 constant TOTAL_SUPPLY = 10 ** 10 * 10**DECIMAL_PLACES;
 
     mapping (address => bool) private _isExcludedFromFee;
 
@@ -74,7 +73,8 @@ contract SupCoin is ERC20, Ownable
 
     modifier lockTheSwap() {
         inSwapAndLiquify = true;
-        _; inSwapAndLiquify = false;
+        _;
+        inSwapAndLiquify = false;
     }
 
     constructor(address router) ERC20(TOKEN_NAME, TOKEN_SYMBOL) {
